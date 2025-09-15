@@ -10,7 +10,7 @@ import "./App.css";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [lessonData, setLessonData] = useState(null);
+  const [lessonData, setLessonData] = useState<any>(null);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
