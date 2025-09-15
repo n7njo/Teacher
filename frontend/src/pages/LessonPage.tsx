@@ -724,7 +724,15 @@ const getTypeColor = (type: string): string => {
   return colors[type] || "#6c757d";
 };
 
-const LessonPage: React.FC = () => {
+interface LessonPageProps {
+  onLessonDataLoad?: (data: any) => void;
+  onToggleSidebar?: () => void;
+}
+
+const LessonPage: React.FC<LessonPageProps> = ({
+  onLessonDataLoad,
+  onToggleSidebar,
+}) => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [loading, setLoading] = useState(true);
@@ -738,7 +746,13 @@ const LessonPage: React.FC = () => {
       try {
         // Try modular API first, fallback to legacy
         const response = await axios.get(`/api/modular/lessons/${lessonId}`);
-        setLesson(response.data);
+        const lessonData = response.data;
+        setLesson(lessonData);
+
+        // Pass lesson data to parent for sidebar
+        if (onLessonDataLoad && lessonData.type === "modular") {
+          onLessonDataLoad(lessonData);
+        }
       } catch (err) {
         setError("Failed to load lesson. Please try again later.");
         console.error("Error fetching lesson:", err);
@@ -803,72 +817,143 @@ const LessonPage: React.FC = () => {
       ] || [];
 
     return (
-      <div>
-        <div className="breadcrumb">
-          <Link to="/">Home</Link>
-          <span>›</span>
-          <span>Lesson</span>
+      <div className="fade-in">
+        {/* Enhanced Breadcrumb */}
+        <div
+          className="breadcrumb"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            marginBottom: "2rem",
+            fontSize: "0.9rem",
+          }}
+        >
+          <Link to="/">🏠 Home</Link>
+          <span className="breadcrumb-separator">›</span>
+          <span>📚 Lesson</span>
         </div>
 
-        <div className="lesson-content">
-          <header className="lesson-header" style={{ marginBottom: "2rem" }}>
-            <h1>{modularLesson.name}</h1>
+        {/* Lesson Header Card */}
+        <div className="glass-card" style={{ marginBottom: "2rem" }}>
+          <header className="lesson-header">
             <div
               style={{
-                padding: "1rem",
-                background: "#f8f9fa",
-                borderRadius: "8px",
                 display: "flex",
                 justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "1rem",
+                alignItems: "flex-start",
+                marginBottom: "1.5rem",
+                flexWrap: "wrap",
+                gap: "1rem",
               }}
             >
-              <div>
-                <strong>Type:</strong> Modular Lesson
-                <span
+              <div style={{ flex: 1, minWidth: "300px" }}>
+                <h1
                   style={{
-                    marginLeft: "10px",
-                    background: "#28a745",
-                    color: "white",
-                    padding: "2px 8px",
-                    borderRadius: "12px",
-                    fontSize: "0.75rem",
-                    fontWeight: "bold",
+                    fontSize: "2.5rem",
+                    margin: "0 0 1rem 0",
+                    background: "var(--gradient-accent)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    fontWeight: "700",
+                    lineHeight: "1.2",
                   }}
                 >
-                  NEW
-                </span>
+                  {modularLesson.name}
+                </h1>
+                {modularLesson.description && (
+                  <p
+                    style={{
+                      fontSize: "1.1rem",
+                      color: "var(--text-muted)",
+                      lineHeight: "1.6",
+                      margin: "0",
+                    }}
+                  >
+                    {modularLesson.description}
+                  </p>
+                )}
               </div>
-              <div>
-                <strong>Duration:</strong> ~
-                {modularLesson.estimatedDurationMinutes} minutes
-              </div>
-            </div>
 
-            {modularLesson.description && (
               <div
+                className="glass-card"
                 style={{
-                  marginBottom: "1.5rem",
-                  fontStyle: "italic",
-                  color: "#666",
+                  padding: "1rem 1.5rem",
+                  background: "var(--glass-bg-hover)",
+                  minWidth: "250px",
+                  textAlign: "center",
                 }}
               >
-                {modularLesson.description}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <span
+                    style={{
+                      background: "var(--primary-green)",
+                      color: "white",
+                      padding: "4px 12px",
+                      borderRadius: "20px",
+                      fontSize: "0.8rem",
+                      fontWeight: "600",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.25rem",
+                    }}
+                  >
+                    ✨ MODULAR
+                  </span>
+                </div>
+                <div
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "600",
+                    color: "var(--text-primary)",
+                    marginBottom: "0.25rem",
+                  }}
+                >
+                  ~{modularLesson.estimatedDurationMinutes}min
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.9rem",
+                    color: "var(--text-muted)",
+                  }}
+                >
+                  Estimated Duration
+                </div>
               </div>
-            )}
+            </div>
           </header>
+        </div>
 
-          <nav className="lesson-navigation" style={{ marginBottom: "2rem" }}>
+        {/* Section Navigation */}
+        <div className="glass-card" style={{ marginBottom: "2rem" }}>
+          <h3
+            style={{
+              fontSize: "1.2rem",
+              fontWeight: "600",
+              color: "var(--text-primary)",
+              marginBottom: "1rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+            }}
+          >
+            🧩 Lesson Sections
+          </h3>
+          <nav className="lesson-navigation">
             <div
               style={{
-                display: "flex",
-                gap: "0.5rem",
-                padding: "0.5rem",
-                background: "#fff",
-                borderRadius: "8px",
-                border: "1px solid #ddd",
-                flexWrap: "wrap",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                gap: "0.75rem",
               }}
             >
               {sections.map((section) => {
@@ -877,46 +962,110 @@ const LessonPage: React.FC = () => {
 
                 if (!hasBlocks) return null;
 
+                const getSectionIcon = (sectionName: string) => {
+                  const icons: Record<string, string> = {
+                    introduction: "🚀",
+                    content: "📚",
+                    practice: "🔧",
+                    assessment: "📝",
+                    closure: "✨",
+                  };
+                  return icons[sectionName] || "📄";
+                };
+
                 return (
                   <button
                     key={section}
-                    className={currentSection === section ? "active" : ""}
+                    className={`section-nav-btn ${currentSection === section ? "active" : ""}`}
                     onClick={() => setCurrentSection(section)}
                     style={{
-                      padding: "0.5rem 1rem",
+                      padding: "0.75rem 1rem",
                       border:
                         currentSection === section
-                          ? "2px solid #007bff"
-                          : "1px solid #ccc",
+                          ? "2px solid var(--primary-green)"
+                          : "1px solid var(--glass-border)",
                       background:
-                        currentSection === section ? "#007bff" : "#fff",
-                      color: currentSection === section ? "white" : "#333",
-                      borderRadius: "4px",
+                        currentSection === section
+                          ? "var(--primary-green)"
+                          : "var(--glass-bg-hover)",
+                      color:
+                        currentSection === section
+                          ? "white"
+                          : "var(--text-primary)",
+                      borderRadius: "12px",
                       cursor: "pointer",
                       fontSize: "0.9rem",
-                      fontWeight:
-                        currentSection === section ? "bold" : "normal",
+                      fontWeight: "500",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      textAlign: "center",
+                      backdropFilter: "blur(10px)",
+                      WebkitBackdropFilter: "blur(10px)",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (currentSection !== section) {
+                        e.currentTarget.style.background =
+                          "var(--glass-bg-active)";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow = "var(--shadow-glass)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (currentSection !== section) {
+                        e.currentTarget.style.background =
+                          "var(--glass-bg-hover)";
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.boxShadow = "none";
+                      }
                     }}
                   >
-                    {section.charAt(0).toUpperCase() + section.slice(1)}
-                    <span
-                      style={{
-                        marginLeft: "5px",
-                        fontSize: "0.75rem",
-                        opacity: 0.8,
-                      }}
-                    >
-                      ({sectionBlocks.length})
+                    <span style={{ fontSize: "1.5rem" }}>
+                      {getSectionIcon(section)}
                     </span>
+                    <div>
+                      <div style={{ fontWeight: "600" }}>
+                        {section.charAt(0).toUpperCase() + section.slice(1)}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "0.75rem",
+                          opacity: 0.8,
+                          marginTop: "0.25rem",
+                        }}
+                      >
+                        {sectionBlocks.length} blocks
+                      </div>
+                    </div>
                   </button>
                 );
               })}
             </div>
           </nav>
+        </div>
 
-          <main className="lesson-content">
+        {/* Main Lesson Content */}
+        <div className="glass-card">
+          <main
+            className="lesson-content"
+            style={{
+              background: "transparent",
+              border: "none",
+              boxShadow: "none",
+              padding: 0,
+            }}
+          >
             <div className={`lesson-section section-${currentSection}`}>
-              <h2 style={{ marginBottom: "1.5rem", color: "#333" }}>
+              <h2
+                style={{
+                  marginBottom: "1.5rem",
+                  color: "var(--text-primary)",
+                  fontSize: "1.8rem",
+                  fontWeight: "600",
+                }}
+              >
                 {currentSection.charAt(0).toUpperCase() +
                   currentSection.slice(1)}
               </h2>
@@ -927,36 +1076,46 @@ const LessonPage: React.FC = () => {
                 ))
               ) : (
                 <div
+                  className="glass-card"
                   style={{
                     padding: "2rem",
                     textAlign: "center",
-                    color: "#666",
-                    background: "#f8f9fa",
-                    borderRadius: "8px",
-                    border: "2px dashed #ddd",
+                    background: "var(--glass-bg-hover)",
+                    border: "2px dashed var(--glass-border)",
                   }}
                 >
-                  <p>No content blocks in this section yet.</p>
+                  <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>
+                    📋
+                  </div>
+                  <p style={{ color: "var(--text-muted)", fontSize: "1.1rem" }}>
+                    No content blocks in this section yet.
+                  </p>
                 </div>
               )}
             </div>
           </main>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: "2rem" }}>
+        {/* Navigation Footer */}
+        <div
+          className="glass-card"
+          style={{
+            textAlign: "center",
+            marginTop: "2rem",
+            background: "var(--glass-bg-hover)",
+          }}
+        >
           <Link
             to="/"
-            className="button"
+            className="btn btn-outline"
             style={{
-              padding: "0.75rem 1.5rem",
-              background: "#007bff",
-              color: "white",
               textDecoration: "none",
-              borderRadius: "4px",
-              display: "inline-block",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
             }}
           >
-            ← Back to Home
+            🏠 Back to Home
           </Link>
         </div>
       </div>
