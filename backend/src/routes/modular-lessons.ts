@@ -74,7 +74,7 @@ router.get("/lessons/:id", async (req: any, res) => {
       modularTablesExist = false;
     }
 
-    let modularCheck = { rows: [{ count: '0' }] };
+    let modularCheck = { rows: [{ count: "0" }] };
     if (modularTablesExist) {
       // Check if this is a migrated lesson (from lessons_v2)
       modularCheck = await req.db.query(
@@ -85,7 +85,12 @@ router.get("/lessons/:id", async (req: any, res) => {
       );
     }
 
-    if (modularTablesExist && modularCheck.rows.length > 0 && modularCheck.rows[0] && parseInt(modularCheck.rows[0].count) > 0) {
+    if (
+      modularTablesExist &&
+      modularCheck.rows.length > 0 &&
+      modularCheck.rows[0] &&
+      parseInt(modularCheck.rows[0].count) > 0
+    ) {
       // Get modular lesson structure
       const lessonQuery = `
         SELECT

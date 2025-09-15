@@ -27,7 +27,7 @@ const Header: React.FC = () => {
             fontWeight: "bold",
           }}
         >
-          🧭 Compass Learning
+          ⚒️ SkillForge
         </Link>
         <div style={{ display: "flex", gap: "1rem" }}>
           <Link

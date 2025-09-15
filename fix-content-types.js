@@ -13,9 +13,9 @@ const { Client } = require("pg");
 const client = new Client({
   host: process.env.NODE_ENV === "development" ? "database" : "localhost",
   port: process.env.NODE_ENV === "development" ? 5432 : 5433,
-  database: "compass_learning",
-  user: "compass_user",
-  password: "compass_password",
+  database: "skillforge_learning",
+  user: "skillforge_user",
+  password: "skillforge_password",
 });
 
 async function fixContentTypes() {

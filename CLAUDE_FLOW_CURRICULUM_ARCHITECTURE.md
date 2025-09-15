@@ -1,8 +1,8 @@
-# Claude Flow Curriculum Architecture
+# SkillForge Curriculum Architecture
 
 ## Overview
 
-This document outlines the comprehensive curriculum architecture designed for Claude Flow, an enhanced learning platform that provides structured, progressive educational content with interactive elements, assessments, and personalized learning paths.
+This document outlines the comprehensive curriculum architecture designed for SkillForge, an enhanced learning platform that provides structured, progressive educational content with interactive elements, assessments, and personalized learning paths.
 
 ## Architecture Components
 
@@ -295,4 +295,4 @@ The curriculum architecture includes enhanced database schema (`/backend/databas
 - Scalability under load
 - User experience quality
 
-This architecture provides a robust foundation for creating engaging, effective, and scalable educational experiences through Claude Flow, supporting learners from beginner to expert levels across multiple programming and technology domains.
+This architecture provides a robust foundation for creating engaging, effective, and scalable educational experiences through SkillForge, supporting learners from beginner to expert levels across multiple programming and technology domains.

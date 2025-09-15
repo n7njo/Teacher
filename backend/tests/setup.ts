@@ -6,7 +6,7 @@ beforeAll(async () => {
   process.env.NODE_ENV = "test";
   process.env.DATABASE_URL =
     process.env.TEST_DATABASE_URL ||
-    "postgresql://compass_user:compass_password@localhost:5433/compass_learning_test";
+    "postgresql://skillforge_user:skillforge_password@localhost:5433/skillforge_learning_test";
 });
 
 afterAll(async () => {
@@ -24,7 +24,7 @@ export const createTestPool = () => {
   return new Pool({
     connectionString:
       process.env.TEST_DATABASE_URL ||
-      "postgresql://compass_user:compass_password@localhost:5433/compass_learning_test",
+      "postgresql://skillforge_user:skillforge_password@localhost:5433/skillforge_learning_test",
     ssl: false,
   });
 };

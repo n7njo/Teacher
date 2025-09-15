@@ -13,7 +13,8 @@ services:
     ports:
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U skillforge_user -d skillforge_learning"]
+      test:
+        ["CMD-SHELL", "pg_isready -U skillforge_user -d skillforge_learning"]
       interval: 10s
       timeout: 5s
       retries: 5

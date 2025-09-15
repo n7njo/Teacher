@@ -1,8 +1,8 @@
-# Compass Learning Platform - Testing Strategy Framework
+# SkillForge Learning Platform - Testing Strategy Framework
 
 ## Overview
 
-This document outlines the comprehensive testing strategy for validating lesson plan effectiveness, user experience, and educational content quality in the Compass Learning Platform.
+This document outlines the comprehensive testing strategy for validating lesson plan effectiveness, user experience, and educational content quality in the SkillForge Learning Platform.
 
 ## 1. Lesson Plan Effectiveness Testing
 

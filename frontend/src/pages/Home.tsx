@@ -43,7 +43,7 @@ const Home: React.FC = () => {
     <div>
       <div style={{ textAlign: "center", marginBottom: "3rem" }}>
         <h1 style={{ fontSize: "3rem", marginBottom: "1rem", color: "white" }}>
-          Welcome to Compass Learning
+          Welcome to SkillForge
         </h1>
         <p
           style={{

@@ -7,7 +7,7 @@ SkillForge is a modern, Docker-based learning platform designed to help users ma
 ## 🚀 Features
 
 - **Structured Learning Path**: Organized in a clear Category → Topic → Lesson hierarchy
-- **Interactive Content**: Rich HTML content with code examples and exercises  
+- **Interactive Content**: Rich HTML content with code examples and exercises
 - **Progress Tracking**: Track completion and time spent on each lesson
 - **Modern Tech Stack**: React frontend, Node.js backend, PostgreSQL database
 - **Docker-First**: Complete containerized development and deployment
@@ -17,6 +17,7 @@ SkillForge is a modern, Docker-based learning platform designed to help users ma
 ## 🏗️ Architecture
 
 ### Core Structure
+
 ```
 Categories (e.g., "Using AI")
 ├── Topics (e.g., "Claude Flow")
@@ -24,6 +25,7 @@ Categories (e.g., "Using AI")
 ```
 
 ### Enhanced Features
+
 - **Skill Levels**: Beginner → Intermediate → Advanced → Expert
 - **Learning Objectives**: Structured using Bloom's Taxonomy
 - **Interactive Elements**: Code editors, visualizations, simulations
@@ -33,18 +35,21 @@ Categories (e.g., "Using AI")
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React** 18.2.0 with TypeScript
 - **React Router** for navigation
 - **Axios** for API communication
 - **Modern CSS** with glassmorphism effects
 
 ### Backend
+
 - **Node.js** with Express.js
 - **TypeScript** for type safety
 - **PostgreSQL** 15 database
 - **Docker** for containerization
 
 ### Development Tools
+
 - **Jest** for testing
 - **ESLint** & **Prettier** for code quality
 - **Nodemon** for development hot reload
@@ -52,29 +57,33 @@ Categories (e.g., "Using AI")
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Docker and Docker Compose
 - Node.js 18+ (for local development)
 
 ### Development Setup
 
 1. **Clone the repository**
+
 ```bash
 git clone <repository-url>
 cd skillforge-learning-platform
 ```
 
 2. **Start all services**
+
 ```bash
 npm run dev
 ```
 
 This will start:
+
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:3001
 - PostgreSQL: localhost:5433
 
 3. **Access the platform**
-Open your browser to http://localhost:3000
+   Open your browser to http://localhost:3000
 
 ### Individual Service Management
 
@@ -82,7 +91,7 @@ Open your browser to http://localhost:3000
 # Backend only
 npm run dev:backend
 
-# Frontend only  
+# Frontend only
 npm run dev:frontend
 
 # Build all services
@@ -107,6 +116,7 @@ The platform uses a PostgreSQL database with the following key tables:
 - **user_topic_progress**: Topic-level progress summaries
 
 Enhanced schema includes:
+
 - **content_blocks**: Modular, reusable content components
 - **lessons_v2**: Advanced lesson structure with skill levels
 - **lesson_blocks**: Links lessons to their content blocks
@@ -114,6 +124,7 @@ Enhanced schema includes:
 ## 📚 API Endpoints
 
 ### Core Endpoints
+
 ```
 GET /api/categories          # List all categories
 GET /api/topics/:categoryId  # Topics in a category
@@ -122,6 +133,7 @@ GET /api/lesson/:lessonId    # Individual lesson content
 ```
 
 ### Enhanced Endpoints
+
 ```
 GET /api/modular/lessons/:id    # Modular lesson structure
 GET /api/modular/blocks         # Available content blocks
@@ -151,6 +163,7 @@ REACT_APP_API_URL=http://localhost:3001
 ## 🧪 Testing
 
 ### Run Tests
+
 ```bash
 # All tests
 npm test
@@ -158,7 +171,7 @@ npm test
 # Backend tests only
 cd backend && npm test
 
-# Frontend tests only  
+# Frontend tests only
 cd frontend && npm test
 
 # Test with coverage
@@ -166,26 +179,31 @@ npm run test:coverage
 ```
 
 ### Test Database
+
 Tests use a separate database: `skillforge_learning_test`
 
 ## 📈 Development Roadmap
 
 ### Phase 1: Foundation ✅
+
 - Basic CRUD operations
 - Docker containerization
 - Initial UI/UX design
 
 ### Phase 2: Enhanced Features 🚧
+
 - Modular content system
 - Advanced progress tracking
 - Skill progression framework
 
 ### Phase 3: Advanced Capabilities 🔜
+
 - Interactive assessments
 - Personalization engine
 - Analytics and reporting
 
 ### Phase 4: Scale & Polish 🔜
+
 - Performance optimization
 - Advanced UI components
 - Production deployment
@@ -199,6 +217,7 @@ Tests use a separate database: `skillforge_learning_test`
 5. Open a Pull Request
 
 ### Code Standards
+
 - **ESLint** and **Prettier** must pass
 - **Test coverage** should be maintained
 - **TypeScript** types required for all new code
@@ -213,7 +232,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 SkillForge aims to revolutionize technical education by providing:
 
 - **Structured Learning**: Clear pathways from novice to expert
-- **Interactive Engagement**: Hands-on coding and practical exercises  
+- **Interactive Engagement**: Hands-on coding and practical exercises
 - **Adaptive Content**: Personalized learning experiences
 - **Community Building**: Collaborative learning environment
 - **Industry Relevance**: Real-world skills and applications

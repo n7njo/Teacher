@@ -10,11 +10,11 @@ const axios = require("axios");
 
 // Database connection
 const client = new Client({
-  host: "database",
-  port: 5432,
-  database: "compass_learning",
-  user: "compass_user",
-  password: "compass_password",
+  host: "localhost",
+  port: 5433,
+  database: "skillforge_learning",
+  user: "skillforge_user",
+  password: "skillforge_password",
 });
 
 async function validateMigration() {
