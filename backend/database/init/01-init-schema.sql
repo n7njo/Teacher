@@ -1,4 +1,4 @@
--- Compass Learning Platform Database Schema
+-- SkillForge Learning Platform Database Schema
 -- Category → Topic → Lesson hierarchy with progress tracking
 
 -- Enable UUID extension
@@ -33,7 +33,7 @@ CREATE TABLE topics (
     UNIQUE(category_id, slug)
 );
 
--- Lessons table (third level) - Enhanced for Claude Flow
+-- Lessons table (third level) - Enhanced for SkillForge
 CREATE TABLE lessons (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     topic_id UUID NOT NULL REFERENCES topics(id) ON DELETE CASCADE,

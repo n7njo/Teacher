@@ -1,7 +1,7 @@
 {
-  "name": "compass-backend",
+  "name": "skillforge-backend",
   "version": "1.0.0",
-  "description": "Backend API for Compass Learning Platform",
+  "description": "Backend API for SkillForge Learning Platform",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",

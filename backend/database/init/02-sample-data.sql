@@ -1,4 +1,4 @@
--- Sample data for Compass Learning Platform
+-- Sample data for SkillForge Learning Platform
 -- Creating the "Using AI" category with claude-flow topic and first lesson
 
 -- Insert "Using AI" category
@@ -43,9 +43,9 @@ INSERT INTO lessons (id, topic_id, name, description, slug, content, order_index
 
 -- Create a sample user for testing
 INSERT INTO users (id, username, email, full_name, role, is_active) VALUES (
-    'd4e5f6g7-h859-4123-defg-456789012345',
+    'd4e5f6a7-a859-4123-defa-456789012345',
     'demo_learner',
-    'demo@compass-learning.local',
+    'demo@skillforge-learning.local',
     'Demo Learner',
     'student',
     true

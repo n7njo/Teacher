@@ -64,15 +64,28 @@ router.get("/lessons/:id", async (req: any, res) => {
   try {
     const { id } = req.params;
 
-    // Check if this is a migrated lesson (from lessons_v2)
-    const modularCheck = await req.db.query(
-      `
-      SELECT COUNT(*) as count FROM lessons_v2 WHERE id = $1
-    `,
-      [id],
-    );
+    // Check if modular tables exist
+    let modularTablesExist = false;
+    try {
+      await req.db.query("SELECT 1 FROM lessons_v2 LIMIT 1");
+      modularTablesExist = true;
+    } catch (error) {
+      // Tables don't exist, use legacy approach
+      modularTablesExist = false;
+    }
 
-    if (parseInt(modularCheck.rows[0].count) > 0) {
+    let modularCheck = { rows: [{ count: '0' }] };
+    if (modularTablesExist) {
+      // Check if this is a migrated lesson (from lessons_v2)
+      modularCheck = await req.db.query(
+        `
+        SELECT COUNT(*) as count FROM lessons_v2 WHERE id = $1
+      `,
+        [id],
+      );
+    }
+
+    if (modularTablesExist && modularCheck.rows.length > 0 && modularCheck.rows[0] && parseInt(modularCheck.rows[0].count) > 0) {
       // Get modular lesson structure
       const lessonQuery = `
         SELECT
@@ -160,6 +173,27 @@ router.get("/lessons/:id", async (req: any, res) => {
 // GET /api/modular/blocks - Get available content blocks
 router.get("/blocks", async (req: any, res) => {
   try {
+    // Check if content_blocks table exists
+    let contentBlocksTableExists = false;
+    try {
+      await req.db.query("SELECT 1 FROM content_blocks LIMIT 1");
+      contentBlocksTableExists = true;
+    } catch (error) {
+      contentBlocksTableExists = false;
+    }
+
+    if (!contentBlocksTableExists) {
+      return res.json({
+        blocks: [],
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 0,
+          pages: 0,
+        },
+      });
+    }
+
     const {
       type,
       difficulty,

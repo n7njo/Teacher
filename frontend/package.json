@@ -1,7 +1,7 @@
 {
-  "name": "compass-frontend",
+  "name": "skillforge-frontend",
   "version": "1.0.0",
-  "description": "React frontend for Compass Learning Platform",
+  "description": "React frontend for SkillForge Learning Platform",
   "private": true,
   "dependencies": {
     "@types/node": "^16.18.39",
@@ -39,5 +39,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://compass_backend:3001"
+  "proxy": "http://skillforge_backend:3001"
 }
