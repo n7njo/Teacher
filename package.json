@@ -1,0 +1,28 @@
+{
+  "name": "compass-learning-platform",
+  "version": "1.0.0",
+  "description": "Docker-based learning platform with category→topic→lesson structure",
+  "main": "index.js",
+  "scripts": {
+    "dev": "docker-compose up --build",
+    "dev:backend": "docker-compose up --build backend",
+    "dev:frontend": "docker-compose up --build frontend",
+    "build": "docker-compose build",
+    "test": "docker-compose run --rm backend npm test",
+    "clean": "docker-compose down -v"
+  },
+  "keywords": [
+    "learning",
+    "education",
+    "docker",
+    "typescript",
+    "react",
+    "node"
+  ],
+  "author": "Claude Code",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

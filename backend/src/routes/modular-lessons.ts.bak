@@ -1,0 +1,576 @@
+import express from 'express';
+import { Pool } from 'pg';
+import Joi from 'joi';
+
+const router = express.Router();
+
+// Validation schemas for modular content
+const contentBlockSchema = Joi.object({
+  title: Joi.string().required(),
+  type: Joi.string().valid('text', 'video', 'code', 'quiz', 'exercise', 'interactive', 'assessment', 'resource', 'media', 'discussion').required(),
+  content: Joi.object().required(),
+  difficulty: Joi.string().valid('beginner', 'intermediate', 'advanced', 'expert').default('beginner'),
+  estimatedTimeMinutes: Joi.number().min(1).default(5),
+  tags: Joi.array().items(Joi.string()).default([]),
+  keywords: Joi.array().items(Joi.string()).default([]),
+  isReusable: Joi.boolean().default(true),
+  isTemplate: Joi.boolean().default(false),
+  templateCategory: Joi.string().optional(),
+});
+
+const blockCompositionSchema = Joi.object({
+  section: Joi.string().valid('introduction', 'content', 'practice', 'assessment', 'closure').required(),
+  blockId: Joi.string().required(),
+  orderIndex: Joi.number().required(),
+  customTitle: Joi.string().optional(),
+  customInstructions: Joi.string().optional(),
+  required: Joi.boolean().default(true),
+});
+
+const modularLessonSchema = Joi.object({
+  topicId: Joi.string().required(),
+  name: Joi.string().required(),
+  slug: Joi.string().required(),
+  description: Joi.string().optional(),
+  lessonType: Joi.string().default('reading'),
+  blockComposition: Joi.array().items(blockCompositionSchema).required(),
+});
+
+// Middleware to inject database pool
+router.use((req: any, res, next) => {
+  req.db = req.app.locals.db;
+  next();
+});
+
+// GET /api/modular/lessons/:id - Get modular lesson structure
+router.get('/lessons/:id', async (req: any, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if this is a migrated lesson (from lessons_v2)
+    const modularCheck = await req.db.query(`
+      SELECT COUNT(*) as count FROM lessons_v2 WHERE id = $1
+    `, [id]);
+
+    if (parseInt(modularCheck.rows[0].count) > 0) {
+      // Get modular lesson structure
+      const lessonQuery = `
+        SELECT
+          l.id, l.name, l.slug, l.description,
+          l.estimated_duration_minutes,
+          lb.section, lb.order_index,
+          cb.id as block_id, cb.title as block_title,
+          cb.type, cb.content, cb.estimated_time_minutes,
+          cb.difficulty, cb.tags, cb.is_reusable,
+          lb.custom_title, lb.custom_instructions, lb.required
+        FROM lessons_v2 l
+        JOIN lesson_blocks lb ON l.id = lb.lesson_id
+        JOIN content_blocks cb ON lb.block_id = cb.id
+        WHERE l.id = $1 AND l.is_active = true AND cb.is_active = true
+        ORDER BY lb.section, lb.order_index
+      `;
+
+      const result = await req.db.query(lessonQuery, [id]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Modular lesson not found' });
+      }
+
+      // Structure the response
+      const lesson = result.rows[0];
+      const sections = {
+        introduction: [],
+        content: [],
+        practice: [],
+        assessment: [],
+        closure: []
+      };
+
+      for (const row of result.rows) {
+        const block = {
+          id: row.block_id,
+          title: row.custom_title || row.block_title,
+          type: row.type,
+          content: row.content,
+          estimatedTimeMinutes: row.estimated_time_minutes,
+          difficulty: row.difficulty,
+          tags: row.tags || [],
+          isReusable: row.is_reusable,
+          customInstructions: row.custom_instructions,
+          required: row.required
+        };
+
+        if (sections[row.section as keyof typeof sections]) {
+          (sections[row.section as keyof typeof sections] as any[]).push(block);
+        }
+      }
+
+      return res.json({
+        id: lesson.id,
+        name: lesson.name,
+        slug: lesson.slug,
+        description: lesson.description,
+        estimatedDurationMinutes: lesson.estimated_duration_minutes,
+        type: 'modular',
+        sections
+      });
+
+    } else {
+      // Fallback to legacy lesson format
+      const legacyResult = await req.db.query(
+        'SELECT * FROM lessons WHERE id = $1 AND is_active = true',
+        [id]
+      );
+
+      if (legacyResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Lesson not found' });
+      }
+
+      const lesson = legacyResult.rows[0];
+      return res.json({
+        ...lesson,
+        type: 'legacy'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error fetching modular lesson:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/modular/blocks - Get available content blocks
+router.get('/blocks', async (req: any, res) => {
+  try {
+    const {
+      type,
+      difficulty,
+      tags,
+      reusable = 'true',
+      page = '1',
+      limit = '20',
+      search
+    } = req.query;
+
+    let query = `
+      SELECT
+        id, title, description, type, difficulty,
+        estimated_time_minutes, tags, keywords,
+        is_reusable, is_template, template_category,
+        created_at, updated_at
+      FROM content_blocks
+      WHERE is_active = true
+    `;
+
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    if (reusable === 'true') {
+      query += ` AND is_reusable = true`;
+    }
+
+    if (type) {
+      params.push(type);
+      query += ` AND type = $${paramIndex++}`;
+    }
+
+    if (difficulty) {
+      params.push(difficulty);
+      query += ` AND difficulty = $${paramIndex++}`;
+    }
+
+    if (tags) {
+      const tagArray = Array.isArray(tags) ? tags : [tags];
+      params.push(tagArray);
+      query += ` AND tags && $${paramIndex++}`;
+    }
+
+    if (search) {
+      params.push(`%${search}%`);
+      query += ` AND (title ILIKE $${paramIndex++} OR description ILIKE $${paramIndex - 1})`;
+    }
+
+    // Add pagination
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    params.push(parseInt(limit), offset);
+    query += ` ORDER BY updated_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
+
+    const result = await req.db.query(query, params);
+
+    // Get total count for pagination
+    let countQuery = `
+      SELECT COUNT(*) as total
+      FROM content_blocks
+      WHERE is_active = true
+    `;
+
+    if (reusable === 'true') {
+      countQuery += ` AND is_reusable = true`;
+    }
+
+    const countParams: any[] = [];
+    let countParamIndex = 1;
+
+    if (type) {
+      countParams.push(type);
+      countQuery += ` AND type = $${countParamIndex++}`;
+    }
+
+    if (difficulty) {
+      countParams.push(difficulty);
+      countQuery += ` AND difficulty = $${countParamIndex++}`;
+    }
+
+    if (tags) {
+      const tagArray = Array.isArray(tags) ? tags : [tags];
+      countParams.push(tagArray);
+      countQuery += ` AND tags && $${countParamIndex++}`;
+    }
+
+    if (search) {
+      countParams.push(`%${search}%`);
+      countQuery += ` AND (title ILIKE $${countParamIndex++} OR description ILIKE $${countParamIndex - 1})`;
+    }
+
+    const countResult = await req.db.query(countQuery, countParams);
+    const total = parseInt(countResult.rows[0].total);
+
+    return res.json({
+      blocks: result.rows,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching content blocks:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/modular/blocks/:id - Get specific content block
+router.get('/blocks/:id', async (req: any, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await req.db.query(`
+      SELECT * FROM content_blocks
+      WHERE id = $1 AND is_active = true
+    `, [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Content block not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching content block:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/modular/blocks - Create new content block
+router.post('/blocks', async (req: any, res) => {
+  try {
+    const { error, value } = contentBlockSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0]?.message || 'Validation error' });
+    }
+
+    const {
+      title,
+      type,
+      content,
+      difficulty,
+      estimatedTimeMinutes,
+      tags,
+      keywords,
+      isReusable,
+      isTemplate,
+      templateCategory
+    } = value;
+
+    const result = await req.db.query(`
+      INSERT INTO content_blocks (
+        title, type, content, difficulty, estimated_time_minutes,
+        tags, keywords, is_reusable, is_template, template_category,
+        status, created_by
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'published', NULL)
+      RETURNING *
+    `, [
+      title, type, JSON.stringify(content), difficulty, estimatedTimeMinutes,
+      tags, keywords, isReusable, isTemplate, templateCategory
+    ]);
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error creating content block:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT /api/modular/blocks/:id - Update content block
+router.put('/blocks/:id', async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    const { error, value } = contentBlockSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0]?.message || 'Validation error' });
+    }
+
+    const {
+      title,
+      type,
+      content,
+      difficulty,
+      estimatedTimeMinutes,
+      tags,
+      keywords,
+      isReusable,
+      isTemplate,
+      templateCategory
+    } = value;
+
+    const result = await req.db.query(`
+      UPDATE content_blocks SET
+        title = $1, type = $2, content = $3, difficulty = $4,
+        estimated_time_minutes = $5, tags = $6, keywords = $7,
+        is_reusable = $8, is_template = $9, template_category = $10,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = $11 AND is_active = true
+      RETURNING *
+    `, [
+      title, type, JSON.stringify(content), difficulty, estimatedTimeMinutes,
+      tags, keywords, isReusable, isTemplate, templateCategory, id
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Content block not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating content block:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/modular/lessons - Create modular lesson
+router.post('/lessons', async (req: any, res) => {
+  try {
+    const { error, value } = modularLessonSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0]?.message || 'Validation error' });
+    }
+
+    const { topicId, name, slug, description, lessonType, blockComposition } = value;
+
+    const client = await req.db.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      // Create lesson
+      const lessonResult = await client.query(`
+        INSERT INTO lessons_v2 (topic_id, name, slug, description, lesson_type)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id
+      `, [topicId, name, slug, description, lessonType]);
+
+      const lessonId = lessonResult.rows[0].id;
+
+      // Add block composition
+      for (const block of blockComposition) {
+        await client.query(`
+          INSERT INTO lesson_blocks (
+            lesson_id, block_id, section, order_index,
+            custom_title, custom_instructions, required
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `, [
+          lessonId,
+          block.blockId,
+          block.section,
+          block.orderIndex,
+          block.customTitle || null,
+          block.customInstructions || null,
+          block.required
+        ]);
+      }
+
+      await client.query('COMMIT');
+      res.status(201).json({ id: lessonId });
+
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+
+  } catch (error) {
+    console.error('Error creating modular lesson:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/modular/templates - Get lesson templates
+router.get('/templates', async (req: any, res) => {
+  try {
+    const { category, skillLevel } = req.query;
+
+    let query = `
+      SELECT
+        tc.id, tc.name, tc.description, tc.category,
+        tc.skill_level, tc.subject_area, tc.suitable_for,
+        tc.usage_count, tc.rating,
+        COUNT(tb.block_id) as block_count
+      FROM template_collections tc
+      LEFT JOIN template_blocks tb ON tc.id = tb.template_id
+      WHERE 1=1
+    `;
+
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    if (category) {
+      params.push(category);
+      query += ` AND tc.category = $${paramIndex++}`;
+    }
+
+    if (skillLevel) {
+      params.push(skillLevel);
+      query += ` AND tc.skill_level = $${paramIndex++}`;
+    }
+
+    query += `
+      GROUP BY tc.id, tc.name, tc.description, tc.category,
+               tc.skill_level, tc.subject_area, tc.suitable_for,
+               tc.usage_count, tc.rating
+      ORDER BY tc.usage_count DESC, tc.rating DESC
+    `;
+
+    const result = await req.db.query(query, params);
+    res.json(result.rows);
+
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/modular/progress/:userId/lesson/:lessonId - Get user's block-level progress
+router.get('/progress/:userId/lesson/:lessonId', async (req: any, res) => {
+  try {
+    const { userId, lessonId } = req.params;
+
+    const progressQuery = `
+      SELECT
+        ubp.block_id,
+        ubp.status,
+        ubp.completion_percentage,
+        ubp.time_spent_seconds,
+        ubp.score,
+        ubp.max_score,
+        ubp.attempts,
+        ubp.progress_data,
+        ubp.last_accessed_at,
+        ubp.completed_at,
+        cb.title as block_title,
+        cb.type as block_type,
+        lb.section,
+        lb.order_index
+      FROM user_block_progress ubp
+      JOIN content_blocks cb ON ubp.block_id = cb.id
+      JOIN lesson_blocks lb ON cb.id = lb.block_id AND lb.lesson_id = ubp.lesson_id
+      WHERE ubp.user_id = $1 AND ubp.lesson_id = $2
+      ORDER BY lb.section, lb.order_index
+    `;
+
+    const result = await req.db.query(progressQuery, [userId, lessonId]);
+
+    // Calculate overall lesson progress
+    const totalBlocks = result.rows.length;
+    const completedBlocks = result.rows.filter((row: any) => row.status === 'completed').length;
+    const totalTime = result.rows.reduce((sum: number, row: any) => sum + (row.time_spent_seconds || 0), 0);
+
+    res.json({
+      lessonId,
+      userId,
+      overallProgress: {
+        totalBlocks,
+        completedBlocks,
+        completionPercentage: totalBlocks > 0 ? Math.round((completedBlocks / totalBlocks) * 100) : 0,
+        totalTimeSeconds: totalTime
+      },
+      blockProgress: result.rows
+    });
+
+  } catch (error) {
+    console.error('Error fetching user progress:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/modular/progress - Update block progress
+router.post('/progress', async (req: any, res) => {
+  try {
+    const {
+      userId,
+      lessonId,
+      blockId,
+      status = 'in_progress',
+      completionPercentage = 0,
+      timeSpentSeconds = 0,
+      progressData = {},
+      score,
+      maxScore
+    } = req.body;
+
+    if (!userId || !lessonId || !blockId) {
+      return res.status(400).json({ error: 'userId, lessonId, and blockId are required' });
+    }
+
+    const now = new Date();
+
+    await req.db.query(`
+      INSERT INTO user_block_progress (
+        user_id, lesson_id, block_id, status, completion_percentage,
+        time_spent_seconds, progress_data, score, max_score,
+        first_accessed_at, last_accessed_at, completed_at, attempts
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 1)
+      ON CONFLICT (user_id, block_id, lesson_id)
+      DO UPDATE SET
+        status = EXCLUDED.status,
+        completion_percentage = EXCLUDED.completion_percentage,
+        time_spent_seconds = user_block_progress.time_spent_seconds + EXCLUDED.time_spent_seconds,
+        progress_data = EXCLUDED.progress_data,
+        score = COALESCE(EXCLUDED.score, user_block_progress.score),
+        max_score = COALESCE(EXCLUDED.max_score, user_block_progress.max_score),
+        last_accessed_at = EXCLUDED.last_accessed_at,
+        completed_at = CASE
+          WHEN EXCLUDED.status = 'completed' THEN EXCLUDED.completed_at
+          ELSE user_block_progress.completed_at
+        END,
+        attempts = user_block_progress.attempts + 1,
+        updated_at = CURRENT_TIMESTAMP
+    `, [
+      userId, lessonId, blockId, status, completionPercentage,
+      timeSpentSeconds, JSON.stringify(progressData), score, maxScore,
+      now, now, status === 'completed' ? now : null
+    ]);
+
+    res.json({ success: true });
+
+  } catch (error) {
+    console.error('Error updating progress:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+export default router;
