@@ -865,3 +865,13 @@
     transform: translateY(0);
   }
 }
+
+/* Tab navigation styles */
+.tab-navigation::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-navigation {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
