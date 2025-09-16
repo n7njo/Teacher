@@ -356,7 +356,7 @@ const Header: React.FC<HeaderProps> = ({
                       maxWidth: "350px",
                       maxHeight: "300px",
                       overflowY: "auto",
-                      zIndex: 1000,
+                      zIndex: 1100,
                     }}
                   >
                     <div

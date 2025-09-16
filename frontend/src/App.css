@@ -875,3 +875,19 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.tab-navigation button {
+  position: relative;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.tab-navigation button:not([style*="var(--primary-green)"]):hover {
+  background-color: var(--glass-bg-hover) !important;
+}
+
+.tab-navigation button:focus {
+  outline: 2px solid var(--primary-green);
+  outline-offset: 2px;
+}

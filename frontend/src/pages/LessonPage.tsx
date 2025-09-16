@@ -847,11 +847,50 @@ const LessonPage: React.FC<LessonPageProps> = ({
                   color: "var(--text-muted)",
                 }}
               >
-                <Link to="/" style={{ color: "var(--text-muted)" }}>
-                  🏠
+                <Link
+                  to="/"
+                  style={{
+                    color: "var(--text-muted)",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  🏠 Home
                 </Link>
                 <span>›</span>
-                <span>📚 Lesson</span>
+                <Link
+                  to="/category/using-ai"
+                  style={{
+                    color: "var(--text-muted)",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  🤖 Using AI
+                </Link>
+                <span>›</span>
+                <Link
+                  to="/category/using-ai/topic/claude-flow"
+                  style={{
+                    color: "var(--text-muted)",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  ⚡ Claude Flow
+                </Link>
+                <span>›</span>
+                <span
+                  style={{ color: "var(--text-primary)", fontWeight: "500" }}
+                >
+                  📚 Lesson
+                </span>
               </div>
               <div
                 style={{
@@ -981,17 +1020,6 @@ const LessonPage: React.FC<LessonPageProps> = ({
                     textTransform: "capitalize",
                     whiteSpace: "nowrap",
                     minHeight: "32px",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (currentSection !== section) {
-                      e.currentTarget.style.background =
-                        "var(--glass-bg-hover)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (currentSection !== section) {
-                      e.currentTarget.style.background = "transparent";
-                    }
                   }}
                 >
                   <span>{getSectionIcon(section)}</span>
