@@ -1,2 +1,6 @@
-[debug] [2025-09-15T16:09:43.296Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2025-09-15T16:09:43.298Z] > authorizing via signed-in user (neil.openshaw@gmail.com)
+[debug] [2025-09-15T23:15:36.101Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-15T23:15:36.102Z] > authorizing via signed-in user (neil.openshaw@gmail.com)
+[debug] [2025-09-15T23:36:54.909Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-15T23:36:54.910Z] > authorizing via signed-in user (neil.openshaw@gmail.com)
+[debug] [2025-09-15T23:37:44.959Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-15T23:37:44.959Z] > authorizing via signed-in user (neil.openshaw@gmail.com)

@@ -96,11 +96,36 @@ const Home: React.FC = () => {
               background: "var(--glass-bg-hover)",
             }}
           >
-            <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🎯</div>
-            <div style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+            <div style={{ marginBottom: "0.75rem" }}>
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--primary-green)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+              </svg>
+            </div>
+            <div
+              style={{
+                fontWeight: "700",
+                color: "var(--text-primary)",
+                fontSize: "1.5rem",
+              }}
+            >
               {categories.length}
             </div>
-            <div style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>
+            <div
+              style={{
+                fontSize: "0.875rem",
+                color: "var(--text-muted)",
+                fontWeight: "500",
+              }}
+            >
               Categories
             </div>
           </div>
@@ -112,11 +137,37 @@ const Home: React.FC = () => {
               background: "var(--glass-bg-hover)",
             }}
           >
-            <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>📚</div>
-            <div style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+            <div style={{ marginBottom: "0.75rem" }}>
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--primary-green)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+            </div>
+            <div
+              style={{
+                fontWeight: "700",
+                color: "var(--text-primary)",
+                fontSize: "1.5rem",
+              }}
+            >
               12+
             </div>
-            <div style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>
+            <div
+              style={{
+                fontSize: "0.875rem",
+                color: "var(--text-muted)",
+                fontWeight: "500",
+              }}
+            >
               Lessons
             </div>
           </div>
@@ -128,11 +179,36 @@ const Home: React.FC = () => {
               background: "var(--glass-bg-hover)",
             }}
           >
-            <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>⚡</div>
-            <div style={{ fontWeight: "600", color: "var(--text-primary)" }}>
+            <div style={{ marginBottom: "0.75rem" }}>
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--primary-green)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <div
+              style={{
+                fontWeight: "700",
+                color: "var(--text-primary)",
+                fontSize: "1.5rem",
+              }}
+            >
               Modern
             </div>
-            <div style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>
+            <div
+              style={{
+                fontSize: "0.875rem",
+                color: "var(--text-muted)",
+                fontWeight: "500",
+              }}
+            >
               Approach
             </div>
           </div>
@@ -154,10 +230,27 @@ const Home: React.FC = () => {
             marginBottom: "1.5rem",
             display: "flex",
             alignItems: "center",
-            gap: "0.5rem",
+            gap: "0.75rem",
+            fontWeight: "700",
           }}
         >
-          🗂️ Learning Categories
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14,2 14,8 20,8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10,9 9,9 8,9"></polyline>
+          </svg>
+          Learning Categories
         </h2>
 
         <div className="grid">
@@ -297,11 +390,52 @@ const Home: React.FC = () => {
             <Link
               to="/category/using-ai"
               className="btn"
-              style={{ textDecoration: "none" }}
+              style={{
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
             >
-              🤖 Start with AI
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <circle cx="12" cy="5" r="2"></circle>
+                <path d="m12 7-3 5h6l-3-5z"></path>
+              </svg>
+              Start with AI
             </Link>
-            <button className="btn btn-outline">📋 View All Lessons</button>
+            <button
+              className="btn btn-outline"
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M8 6h13"></path>
+                <path d="M8 12h13"></path>
+                <path d="M8 18h13"></path>
+                <path d="M3 6h.01"></path>
+                <path d="M3 12h.01"></path>
+                <path d="M3 18h.01"></path>
+              </svg>
+              View All Lessons
+            </button>
           </div>
         </div>
       )}

@@ -26,7 +26,11 @@ function App() {
 
   return (
     <div className="App">
-      <Header onNavigationToggle={toggleSidebar} showNavigationToggle={true} />
+      <Header
+        onNavigationToggle={toggleSidebar}
+        showNavigationToggle={true}
+        currentLessonData={lessonData}
+      />
 
       <NavigationSidebar
         isOpen={sidebarOpen}
