@@ -612,14 +612,12 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                     if (!isCurrentLesson) {
                       e.currentTarget.style.background =
                         "var(--glass-bg-hover)";
-                      e.currentTarget.style.transform = "translateY(-1px)";
                       e.currentTarget.style.boxShadow = "var(--shadow-sm)";
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isCurrentLesson) {
                       e.currentTarget.style.background = "var(--glass-bg)";
-                      e.currentTarget.style.transform = "translateY(0)";
                       e.currentTarget.style.boxShadow = "none";
                     }
                   }}

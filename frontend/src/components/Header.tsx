@@ -102,11 +102,9 @@ const Header: React.FC<HeaderProps> = ({
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "var(--glass-bg-active)";
-                e.currentTarget.style.transform = "scale(1.05)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = "var(--glass-bg-hover)";
-                e.currentTarget.style.transform = "scale(1)";
               }}
             >
               <svg

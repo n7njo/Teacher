@@ -221,7 +221,6 @@
 }
 
 .glass-card:hover {
-  transform: translateY(-2px);
   background: var(--glass-bg-hover);
   border-color: var(--glass-border-strong);
   box-shadow: var(--shadow-lg);
@@ -307,7 +306,6 @@
 }
 
 .btn:hover {
-  transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
   background: linear-gradient(
     135deg,
@@ -322,7 +320,7 @@
 }
 
 .btn:active {
-  transform: translateY(0);
+  /* Active state styling - no transform */
 }
 
 /* Professional Button Variants */
@@ -336,7 +334,6 @@
 .btn-secondary:hover {
   background: var(--glass-bg-active);
   border-color: var(--glass-border-strong);
-  transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
@@ -351,7 +348,6 @@
 .btn-outline:hover {
   background: var(--primary-green);
   color: var(--text-inverse);
-  transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
@@ -579,7 +575,6 @@
 
 .nav-sidebar-toggle:hover {
   background: var(--glass-bg-active);
-  transform: scale(1.05);
 }
 
 /* Progress Tracker */
